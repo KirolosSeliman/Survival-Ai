@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 05327e63eee1e7f49a3fc33f69d9b0c1
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 306726
+  packageName: Simple Third Person Camera
+  packageVersion: 1.0.0
+  assetPath: Assets/EnricoBC/ThirdPersonCamera/Scripts/Interfaces/ITargetable.cs
+  uploadId: 720917

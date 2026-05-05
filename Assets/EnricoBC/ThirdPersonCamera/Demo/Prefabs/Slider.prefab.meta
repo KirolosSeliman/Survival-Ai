@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 103d725378245754391914515dab40ff
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 306726
+  packageName: Simple Third Person Camera
+  packageVersion: 1.0.0
+  assetPath: Assets/EnricoBC/ThirdPersonCamera/Demo/Prefabs/Slider.prefab
+  uploadId: 720917

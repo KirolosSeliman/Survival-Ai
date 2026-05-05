@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 24cb25bcce2b4104082b87b54dd060ed
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 306726
+  packageName: Simple Third Person Camera
+  packageVersion: 1.0.0
+  assetPath: Assets/EnricoBC/ThirdPersonCamera/Demo/Scripts/MovementController.cs
+  uploadId: 720917

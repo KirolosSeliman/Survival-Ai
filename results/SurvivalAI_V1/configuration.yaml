@@ -1,0 +1,219 @@
+default_settings: null
+behaviors:
+  Pirate:
+    trainer_type: ppo
+    hyperparameters:
+      batch_size: 2048
+      buffer_size: 40960
+      learning_rate: 0.0003
+      beta: 0.005
+      epsilon: 0.2
+      lambd: 0.95
+      num_epoch: 3
+      shared_critic: false
+      learning_rate_schedule: linear
+      beta_schedule: linear
+      epsilon_schedule: linear
+    checkpoint_interval: 1000000
+    network_settings:
+      normalize: false
+      hidden_units: 256
+      num_layers: 2
+      vis_encode_type: simple
+      memory: null
+      goal_conditioning_type: hyper
+      deterministic: false
+    reward_signals:
+      extrinsic:
+        gamma: 0.99
+        strength: 1.0
+        network_settings:
+          normalize: false
+          hidden_units: 128
+          num_layers: 2
+          vis_encode_type: simple
+          memory: null
+          goal_conditioning_type: hyper
+          deterministic: false
+    init_path: null
+    keep_checkpoints: 10
+    even_checkpoints: false
+    max_steps: 80000000
+    time_horizon: 128
+    summary_freq: 20000
+    threaded: false
+    self_play: null
+    behavioral_cloning: null
+env_settings:
+  env_path: C:\Unity Folder\Survival Ai\Builds\Survival Ai.exe
+  env_args: null
+  base_port: 5005
+  num_envs: 1
+  num_areas: 1
+  timeout_wait: 60
+  seed: -1
+  max_lifetime_restarts: 10
+  restarts_rate_limit_n: 1
+  restarts_rate_limit_period_s: 60
+engine_settings:
+  width: 84
+  height: 84
+  quality_level: 5
+  time_scale: 15.0
+  target_frame_rate: -1
+  capture_frame_rate: 60
+  no_graphics: true
+  no_graphics_monitor: false
+environment_parameters:
+  difficulty:
+    curriculum:
+    - value:
+        sampler_type: constant
+        sampler_parameters:
+          seed: 1331
+          value: 0.0
+      name: L0_bootstrap_navigation
+      completion_criteria:
+        behavior: Pirate
+        measure: reward
+        min_lesson_length: 800
+        signal_smoothing: true
+        threshold: 0.15
+        require_reset: true
+    - value:
+        sampler_type: constant
+        sampler_parameters:
+          seed: 1332
+          value: 1.0
+      name: L1_small_goal_wood3
+      completion_criteria:
+        behavior: Pirate
+        measure: reward
+        min_lesson_length: 1000
+        signal_smoothing: true
+        threshold: 0.3
+        require_reset: true
+    - value:
+        sampler_type: constant
+        sampler_parameters:
+          seed: 1333
+          value: 2.0
+      name: L2_wood5
+      completion_criteria:
+        behavior: Pirate
+        measure: reward
+        min_lesson_length: 1200
+        signal_smoothing: true
+        threshold: 0.45
+        require_reset: true
+    - value:
+        sampler_type: constant
+        sampler_parameters:
+          seed: 1334
+          value: 3.0
+      name: L3_wood8
+      completion_criteria:
+        behavior: Pirate
+        measure: reward
+        min_lesson_length: 1500
+        signal_smoothing: true
+        threshold: 0.6
+        require_reset: true
+    - value:
+        sampler_type: constant
+        sampler_parameters:
+          seed: 1335
+          value: 4.0
+      name: L4_wood10_no_enemy
+      completion_criteria:
+        behavior: Pirate
+        measure: reward
+        min_lesson_length: 1800
+        signal_smoothing: true
+        threshold: 0.75
+        require_reset: true
+    - value:
+        sampler_type: constant
+        sampler_parameters:
+          seed: 1336
+          value: 5.0
+      name: L5_intro_enemy_very_easy
+      completion_criteria:
+        behavior: Pirate
+        measure: reward
+        min_lesson_length: 2200
+        signal_smoothing: true
+        threshold: 0.8
+        require_reset: true
+    - value:
+        sampler_type: constant
+        sampler_parameters:
+          seed: 1337
+          value: 6.0
+      name: L6_enemy_low_density
+      completion_criteria:
+        behavior: Pirate
+        measure: reward
+        min_lesson_length: 2600
+        signal_smoothing: true
+        threshold: 0.85
+        require_reset: true
+    - value:
+        sampler_type: constant
+        sampler_parameters:
+          seed: 1338
+          value: 7.0
+      name: L7_enemy_medium_density
+      completion_criteria:
+        behavior: Pirate
+        measure: reward
+        min_lesson_length: 3200
+        signal_smoothing: true
+        threshold: 0.9
+        require_reset: true
+    - value:
+        sampler_type: constant
+        sampler_parameters:
+          seed: 1339
+          value: 8.0
+      name: L8_enemy_stronger
+      completion_criteria:
+        behavior: Pirate
+        measure: reward
+        min_lesson_length: 4000
+        signal_smoothing: true
+        threshold: 0.95
+        require_reset: true
+    - value:
+        sampler_type: constant
+        sampler_parameters:
+          seed: 1340
+          value: 9.0
+      name: L9_near_final
+      completion_criteria:
+        behavior: Pirate
+        measure: reward
+        min_lesson_length: 5000
+        signal_smoothing: true
+        threshold: 1.0
+        require_reset: true
+    - value:
+        sampler_type: uniform
+        sampler_parameters:
+          seed: 1341
+          min_value: 9.0
+          max_value: 10.0
+      name: L10_final_with_variation
+      completion_criteria: null
+checkpoint_settings:
+  run_id: SurvivalAI_V1
+  initialize_from: null
+  load_model: false
+  resume: false
+  force: true
+  train_model: false
+  inference: false
+  results_dir: results
+torch_settings:
+  device: cpu
+debug: false

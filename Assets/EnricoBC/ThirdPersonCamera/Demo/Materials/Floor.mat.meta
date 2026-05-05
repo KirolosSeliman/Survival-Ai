@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 98b1f7c1a14ab65459fbf8d563708edb
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 306726
+  packageName: Simple Third Person Camera
+  packageVersion: 1.0.0
+  assetPath: Assets/EnricoBC/ThirdPersonCamera/Demo/Materials/Floor.mat
+  uploadId: 720917

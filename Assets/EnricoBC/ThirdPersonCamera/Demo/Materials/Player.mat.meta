@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: bc3f57c998abd3c43bb9ada1cf666a4f
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 306726
+  packageName: Simple Third Person Camera
+  packageVersion: 1.0.0
+  assetPath: Assets/EnricoBC/ThirdPersonCamera/Demo/Materials/Player.mat
+  uploadId: 720917

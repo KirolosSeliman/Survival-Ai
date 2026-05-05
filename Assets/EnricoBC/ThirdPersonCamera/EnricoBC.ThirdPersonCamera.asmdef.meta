@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 4e2d50989df9084439e436682d596b72
+AssemblyDefinitionImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 306726
+  packageName: Simple Third Person Camera
+  packageVersion: 1.0.0
+  assetPath: Assets/EnricoBC/ThirdPersonCamera/EnricoBC.ThirdPersonCamera.asmdef
+  uploadId: 720917

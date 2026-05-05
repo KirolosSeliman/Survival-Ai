@@ -1,0 +1,77 @@
+{
+    "difficulty": {
+        "lesson_num": 3
+    },
+    "Pirate": {
+        "checkpoints": [
+            {
+                "steps": 999904,
+                "file_path": "results\\SurvivalAI_V1\\Pirate\\Pirate-999904.onnx",
+                "reward": 0.49128886084589696,
+                "creation_time": 1769026642.2356522,
+                "auxillary_file_paths": [
+                    "results\\SurvivalAI_V1\\Pirate\\Pirate-999904.pt"
+                ]
+            },
+            {
+                "steps": 1999904,
+                "file_path": "results\\SurvivalAI_V1\\Pirate\\Pirate-1999904.onnx",
+                "reward": -0.20379297888797263,
+                "creation_time": 1769030734.6808577,
+                "auxillary_file_paths": [
+                    "results\\SurvivalAI_V1\\Pirate\\Pirate-1999904.pt"
+                ]
+            },
+            {
+                "steps": 2999998,
+                "file_path": "results\\SurvivalAI_V1\\Pirate\\Pirate-2999998.onnx",
+                "reward": 0.9255994225127829,
+                "creation_time": 1769034836.4320905,
+                "auxillary_file_paths": [
+                    "results\\SurvivalAI_V1\\Pirate\\Pirate-2999998.pt"
+                ]
+            },
+            {
+                "steps": 3999920,
+                "file_path": "results\\SurvivalAI_V1\\Pirate\\Pirate-3999920.onnx",
+                "reward": 0.7185095537883731,
+                "creation_time": 1769039052.841083,
+                "auxillary_file_paths": [
+                    "results\\SurvivalAI_V1\\Pirate\\Pirate-3999920.pt"
+                ]
+            },
+            {
+                "steps": 4999978,
+                "file_path": "results\\SurvivalAI_V1\\Pirate\\Pirate-4999978.onnx",
+                "reward": -2.081392915590721,
+                "creation_time": 1769043318.287101,
+                "auxillary_file_paths": [
+                    "results\\SurvivalAI_V1\\Pirate\\Pirate-4999978.pt"
+                ]
+            },
+            {
+                "steps": 5335042,
+                "file_path": "results\\SurvivalAI_V1\\Pirate\\Pirate-5335042.onnx",
+                "reward": 0.04627491161227226,
+                "creation_time": 1769044881.7383413,
+                "auxillary_file_paths": [
+                    "results\\SurvivalAI_V1\\Pirate\\Pirate-5335042.pt"
+                ]
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 5335042,
+            "file_path": "results\\SurvivalAI_V1\\Pirate.onnx",
+            "reward": 0.04627491161227226,
+            "creation_time": 1769044881.7383413,
+            "auxillary_file_paths": [
+                "results\\SurvivalAI_V1\\Pirate\\Pirate-5335042.pt"
+            ]
+        }
+    },
+    "metadata": {
+        "stats_format_version": "0.3.0",
+        "mlagents_version": "1.1.0",
+        "torch_version": "2.9.1+cpu"
+    }
+}

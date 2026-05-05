@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 060175ff629d40f49b699257216e0e61
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 306726
+  packageName: Simple Third Person Camera
+  packageVersion: 1.0.0
+  assetPath: Assets/EnricoBC/ThirdPersonCamera/Demo/Demo.unity
+  uploadId: 720917
