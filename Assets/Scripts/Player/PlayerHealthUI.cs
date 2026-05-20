@@ -9,7 +9,7 @@ public class PlayerHealthUI : MonoBehaviour
     [SerializeField] private TMP_Text healthText;
 
     [Header("Source")]
-    [SerializeField] private PlayerAgentRefs playerRefs; // drag your player here
+    [SerializeField] private PlayerAgentRefs playerRefs; 
 
     private void Awake()
     {

@@ -2,7 +2,7 @@
 
 public class PlayerHarvest : MonoBehaviour
 {
-    [Header("References (required)")]
+    [Header("References")]
     [SerializeField] private PlayerAgent agent;
     [SerializeField] private PlayerAgentRefs refs;
 
@@ -13,9 +13,9 @@ public class PlayerHarvest : MonoBehaviour
         if (agent == null) agent = GetComponentInParent<PlayerAgent>();
         if (refs == null) refs = GetComponentInParent<PlayerAgentRefs>();
 
-        if (agent == null) throw new MissingReferenceException("PlayerHarvest requires PlayerAgent in parents.");
-        if (refs == null) throw new MissingReferenceException("PlayerHarvest requires PlayerAgentRefs in parents.");
-        if (agent.config == null) throw new MissingReferenceException("PlayerHarvest requires PlayerAgent.config.");
+        if (agent == null) throw new MissingReferenceException("PlayerHarvest requires PlayerAgent");
+        if (refs == null) throw new MissingReferenceException("PlayerHarvest requires PlayerAgentRefs");
+        if (agent.config == null) throw new MissingReferenceException("PlayerHarvest requires PlayerAgent.config");
 
         agent.config.ValidateRuntime();
         hits = new Collider[Mathf.Max(8, agent.config.harvestMaxHits)];
@@ -41,19 +41,11 @@ public class PlayerHarvest : MonoBehaviour
         Transform playerT = refs.body != null ? refs.body : transform;
         Vector3 origin = playerT.position;
 
-        int count = Physics.OverlapSphereNonAlloc(
-            origin,
-            cfg.harvestMaxDistance,
-            hits,
-            cfg.treeLayerMask,
-            QueryTriggerInteraction.Collide
-        );
+        int count = Physics.OverlapSphereNonAlloc(origin, cfg.harvestMaxDistance, hits, cfg.treeLayerMask, QueryTriggerInteraction.Collide);
 
         if (count <= 0) return false;
 
-        HarvestTree chosen = cfg.harvestPreferClosestTree
-            ? ChooseClosestValid(cfg, origin, count)
-            : ChooseRandomValid(cfg, origin, count);
+        HarvestTree chosen = cfg.harvestPreferClosestTree ? ChooseClosestValid(cfg, origin, count) : ChooseRandomValid(cfg, origin, count);
 
         if (chosen == null) return false;
 
@@ -74,15 +66,15 @@ public class PlayerHarvest : MonoBehaviour
 
             if (cfg.requireTreeTag && !c.CompareTag(cfg.treeTag)) continue;
 
-            HarvestTree t = c.GetComponentInParent<HarvestTree>();
-            if (t == null) continue;
-            if (t.IsDepleted) continue;
+            HarvestTree tree = c.GetComponentInParent<HarvestTree>();
+            if (tree == null) continue;
+            if (tree.IsDepleted) continue;
 
-            float sqr = (t.transform.position - origin).sqrMagnitude;
+            float sqr = (tree.transform.position - origin).sqrMagnitude;
             if (sqr <= bestSqr)
             {
                 bestSqr = sqr;
-                best = t;
+                best = tree;
             }
         }
 
@@ -102,16 +94,16 @@ public class PlayerHarvest : MonoBehaviour
 
             if (cfg.requireTreeTag && !c.CompareTag(cfg.treeTag)) continue;
 
-            HarvestTree t = c.GetComponentInParent<HarvestTree>();
-            if (t == null) continue;
-            if (t.IsDepleted) continue;
+            HarvestTree tree = c.GetComponentInParent<HarvestTree>();
+            if (tree == null) continue;
+            if (tree.IsDepleted) continue;
 
-            float sqr = (t.transform.position - origin).sqrMagnitude;
+            float sqr = (tree.transform.position - origin).sqrMagnitude;
             if (sqr > maxSqr) continue;
 
             validCount++;
             if (Random.Range(0, validCount) == 0)
-                chosen = t;
+                chosen = tree;
         }
 
         return chosen;

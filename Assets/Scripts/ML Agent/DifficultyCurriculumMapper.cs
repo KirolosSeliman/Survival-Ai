@@ -40,20 +40,20 @@ public class DifficultyCurriculumMapper : MonoBehaviour
     [SerializeField] private float easyEnemyAttackCooldown = 5.0f;
     [SerializeField] private float easyEnemyMoveSpeed = 1.0f;
 
-    [Header("Anti-collapse shaping (IMPORTANT)")]
-    [Tooltip("Enemy difficulty scales non-linearly: tEnemy = t^power. >1 means slower early ramp.")]
+    [Header("Anti-collapse shaping")]
+    [Tooltip("Enemy difficulty scales exponentially, but its flattened.")]
     [SerializeField] private float enemyCurvePower = 2.2f;
 
-    [Tooltip("Drain scales slightly non-linearly to avoid drowning reward.")]
+    [Tooltip("Drain scales exponentially (flattened).")]
     [SerializeField] private float drainCurvePower = 1.4f;
 
-    [Tooltip("Clamp step penalty so it can't dominate in later lessons.")]
+    [Tooltip("Clamp step penalty so it can't dominate")]
     [SerializeField] private float maxNegativeStepPenalty = -0.0002f;
 
-    [Tooltip("Clamp water step penalty so it can't dominate in later lessons.")]
+    [Tooltip("Clamp water step penalty so it can't dominate")]
     [SerializeField] private float maxNegativeWaterStepPenalty = -0.00025f;
 
-    [Tooltip("Scale wood reward with difficulty to keep farming relevant at high difficulty.")]
+    [Tooltip("Scale wood reward with difficulty to keep farming the main objectif at the higher levels.")]
     [SerializeField] private bool scaleWoodRewardWithDifficulty = true;
 
     [Tooltip("At max difficulty, wood pickup reward will be multiplied by this factor.")]
@@ -70,15 +70,12 @@ public class DifficultyCurriculumMapper : MonoBehaviour
     }
     private float GetEffectiveDifficultyRaw()
     {
-        // En training headless/build, on ne veut JAMAIS l override inspector
         if (Application.isBatchMode)
         {
             return Academy.Instance.EnvironmentParameters.GetWithDefault(difficultyParamName, difficultyMin);
         }
 
-        return useInspectorDifficulty
-            ? inspectorDifficulty
-            : Academy.Instance.EnvironmentParameters.GetWithDefault(difficultyParamName, difficultyMin);
+        return useInspectorDifficulty ? inspectorDifficulty : Academy.Instance.EnvironmentParameters.GetWithDefault(difficultyParamName, difficultyMin);
     }
     private void Awake()
     {
@@ -87,7 +84,7 @@ public class DifficultyCurriculumMapper : MonoBehaviour
 
         if (baseConfigAsset == null)
         {
-            Debug.LogError("[DifficultyCurriculumMapper] Missing baseConfigAsset reference.", this);
+            Debug.LogError("[DifficultyCurriculumMapper] Missing baseConfigAsset ", this);
             return;
         }
 
@@ -107,7 +104,7 @@ public class DifficultyCurriculumMapper : MonoBehaviour
 
         float d = GetEffectiveDifficultyRaw();
         //Debug.Log($"[CurriculumMapper] difficultyParam='{difficultyParamName}' value={d} (default={difficultyMin})");
-
+        // on les enlèves durant les vrais entrainements,car consome pour rien
         float t = Mathf.InverseLerp(difficultyMin, difficultyMax, d);
         t = Mathf.Clamp01(t);
 
@@ -119,18 +116,18 @@ public class DifficultyCurriculumMapper : MonoBehaviour
 
     private void ApplyMapping(float t01)
     {
-        // Split curves: enemies ramp slower than "general progression"
+  
         float tEnemy = Mathf.Pow(t01, Mathf.Max(0.01f, enemyCurvePower));
         float tDrain = Mathf.Pow(t01, Mathf.Max(0.01f, drainCurvePower));
 
-        // --- Goals / player ---
+        // player goals
         runtimeConfig.targetWood = Mathf.RoundToInt(Mathf.Lerp(easyTargetWood, baseConfigAsset.targetWood, t01));
         runtimeConfig.targetWood = Mathf.Max(1, runtimeConfig.targetWood);
 
         runtimeConfig.playerMaxHp = Mathf.Lerp(easyPlayerMaxHp, baseConfigAsset.playerMaxHp, t01);
         runtimeConfig.playerDamageToEnemy = Mathf.Lerp(easyPlayerDamageToEnemy, baseConfigAsset.playerDamageToEnemy, t01);
 
-        // --- Costs (anti-drowning clamps) ---
+        // fonction de penalité de temps
         runtimeConfig.hpDrainPerSecond = Mathf.Lerp(easyHpDrainPerSecond, baseConfigAsset.hpDrainPerSecond, tDrain);
 
         runtimeConfig.stepPenalty = Mathf.Lerp(easyStepPenalty, baseConfigAsset.stepPenalty, t01);
@@ -139,9 +136,9 @@ public class DifficultyCurriculumMapper : MonoBehaviour
         runtimeConfig.waterStepPenalty = Mathf.Lerp(easyWaterStepPenalty, baseConfigAsset.waterStepPenalty, t01);
         runtimeConfig.waterStepPenalty = Mathf.Max(runtimeConfig.waterStepPenalty, maxNegativeWaterStepPenalty);
 
-        // --- Enemies (non-linear ramp) ---
+        // Ennemy
         runtimeConfig.enemySpawnChancePerTree = Mathf.Lerp(easyEnemySpawnChancePerTree, baseConfigAsset.enemySpawnChancePerTree, tEnemy);
-        runtimeConfig.enemyMaxHealth = 1f;
+        runtimeConfig.enemyMaxHealth = 1f; // on la set à 1hp, car dans les niveaux supérieurs où il y a beaucoup d'ennemis, c'est trop difficile de devoir les attaquer plusieurs fois pour les tuer, surtout quand il y en a plusieurs autour
         runtimeConfig.enemyDamageToPlayer = Mathf.Lerp(easyEnemyDamageToPlayer, baseConfigAsset.enemyDamageToPlayer, tEnemy);
 
         if (scaleEnemyBrain)
@@ -160,7 +157,7 @@ public class DifficultyCurriculumMapper : MonoBehaviour
         // hard code pour s'assurer qu'il n'y a pas d'erreur
         if (dEff < 5.0f) runtimeConfig.enemySpawnChancePerTree = 0f;
 
-        // --- Rewards (prevent farming from becoming irrelevant) ---
+        // Rewards 
         runtimeConfig.rewardWin = baseConfigAsset.rewardWin;
         runtimeConfig.penaltyDeath = baseConfigAsset.penaltyDeath;
 

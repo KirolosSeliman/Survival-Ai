@@ -3,18 +3,14 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "ML/Player Agent Config", fileName = "PlayerAgentConfig")]
 public class PlayerAgentConfig : ScriptableObject
 {
-    // =========================
-    // EPISODE
-    // =========================
+
     [Header("Episode")]
     [Min(1)] public int maxStep = 15000;
     [Min(0f)] public float hpDrainPerSecond = 0.2f;
     public float stepPenalty = -0.00002f;
     public bool endEpisodeOnTargetWood = true;
 
-    // =========================
-    // PLAYER
-    // =========================
+
     [Header("Player - Movement")]
     [Min(0.01f)] public float moveSpeed = 5.0f;
     [Min(0.01f)] public float rotateSpeedDegPerSec = 720f;
@@ -28,9 +24,6 @@ public class PlayerAgentConfig : ScriptableObject
     [Min(0f)] public float playerDamageToEnemy = 10f;
     [Range(0f, 1f)] public float healOnEnemyKillFraction = 0.04f;
 
-    // =========================
-    // HARVEST / TREES / WOOD
-    // =========================
     [Header("Harvesting")]
     [Min(0.1f)] public float harvestMaxDistance = 2.25f;
     public bool harvestPreferClosestTree = true;
@@ -42,10 +35,8 @@ public class PlayerAgentConfig : ScriptableObject
     [Min(1)] public int treeWoodPerHit = 1;
     [Min(0f)] public float treeDropRadius = 1.75f;
     [Min(0f)] public float treeDropYOffset = 0.25f;
-
-    // =========================
-    // REWARDS / SHAPING
-    // =========================
+    
+    // reward shaping
     [Header("Rewards")]
     public float rewardWin = 1.0f;
     public float penaltyDeath = -1.0f;
@@ -54,15 +45,13 @@ public class PlayerAgentConfig : ScriptableObject
     public float rewardEnemyKill = 0.10f;
     public float waterStepPenalty = -0.00005f;
 
-    [Tooltip("Negative reward applied when the agent performs a slash that hits neither an enemy nor a tree.")]
+    
     public float penaltyMissSwing = -0.002f;
 
     [Header("Anti-Farming")]
     [Min(0)] public int maxRewardedHitsPerEnemy = 10;
 
-    // =========================
-    // OBSERVATIONS
-    // =========================
+
     [Header("Observations")]
     [Min(1f)] public float maxRelevantDistance = 25f;
 
@@ -71,9 +60,7 @@ public class PlayerAgentConfig : ScriptableObject
     [Min(0.1f)] public float rayLength = 20f;
     public LayerMask rayMask;
 
-    // =========================
-    // PHYSICS / LAYERS / TAGS
-    // =========================
+
     [Header("Ground / Water")]
     public LayerMask waterMask;
     [Min(0.01f)] public float groundCheckDistance = 2.0f;
@@ -88,9 +75,6 @@ public class PlayerAgentConfig : ScriptableObject
     public string enemyTag = "Enemy";
     public string playerTag = "Player";
 
-    // =========================
-    // ENEMY DIFFICULTY
-    // =========================
     [Header("Enemy - Health / Damage")]
     [Min(1f)] public float enemyMaxHealth = 30f;
     [Min(0f)] public float enemyDamageToPlayer = 5f;
@@ -120,9 +104,7 @@ public class PlayerAgentConfig : ScriptableObject
     [Range(1f, 360f)] public float enemyRadarRangeAngle = 90f;
     [Min(0.1f)] public float enemyRadarTurningSpeed = 90f;
 
-    // =========================
-    // SPAWNING / RESET
-    // =========================
+
     [Header("Enemy Spawning Near Trees")]
     [Range(0f, 1f)] public float enemySpawnChancePerTree = 1.0f;
     [Min(0f)] public float enemySpawnOffsetRadius = 2.0f;
@@ -165,7 +147,7 @@ public class PlayerAgentConfig : ScriptableObject
 #if UNITY_EDITOR
     private void OnValidate()
     {
-        ValidateRuntime();
+        ValidateRuntime(); 
     }
 #endif
 }

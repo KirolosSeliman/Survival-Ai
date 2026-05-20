@@ -18,7 +18,7 @@ public class PlayerAnimatorController : MonoBehaviour
 
     private void Start()
     {
-        // Forces Animator to bind to the Avatar/rig on play.
+        // force le binding avec l'avatar
         if (animator != null)
         {
             animator.Rebind();
@@ -30,7 +30,7 @@ public class PlayerAnimatorController : MonoBehaviour
     {
         if (animator == null || rb == null) return;
 
-        Vector3 v = rb.linearVelocity; // more standard than linearVelocity
+        Vector3 v = rb.linearVelocity; 
         v.y = 0f;
         animator.SetFloat(speedParam, v.magnitude);
     }

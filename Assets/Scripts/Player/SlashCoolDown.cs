@@ -12,20 +12,13 @@ public class SlashCoolDown : MonoBehaviour
     public bool IsReady => Time.time > nextTimeReady;
     public float CooldownTime => slashCooldown;
 
-    private void Awake()
-    {
-        Debug.Assert(slashCooldown > 0);
-    }
+    private void Awake() => Debug.Assert(slashCooldown > 0);
+    
 
-    public void ResetSlashCooldown()
-    {
-        nextTimeReady = 0f;
-    }
+    public void ResetSlashCooldown() =>  nextTimeReady = 0f;
+    
 
-    public void SetCooldown(float seconds)
-    {
-        slashCooldown = Mathf.Max(0.01f, seconds);
-    }
+    public void SetCooldown(float seconds) => slashCooldown = Mathf.Max(0.01f, seconds);
 
     public bool TrySlash()
     {

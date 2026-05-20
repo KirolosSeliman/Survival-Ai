@@ -34,16 +34,14 @@ public class SwordHitboxRelay : MonoBehaviour
         if (agent == null || other == null) return;
 
         int id = other.GetInstanceID();
+
         if (hitThisWindow.Contains(id)) return;
         hitThisWindow.Add(id);
 
-        // Enemy-only. Trees are harvested by PlayerHarvest to avoid double drops/rewards.
         if (!other.CompareTag(enemyTag))
             return;
 
         var hp = other.GetComponentInParent<EnemyHealth>();
-        if (hp == null || hp.Current <= 0f)
-            return;
 
         agent.NotifyEnemyHit(hp.gameObject, enemyDamage);
         hp.TakeDamage(enemyDamage);

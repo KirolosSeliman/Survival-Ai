@@ -5,16 +5,16 @@ public class EpisodeResetManager : MonoBehaviour
 {
     public static EpisodeResetManager Instance { get; private set; }
 
-    [Header("Config (single source of truth at runtime)")]
+    [Header("Config")]
     [SerializeField] private PlayerAgentConfig config;
 
-    [Header("Curriculum (optional)")]
+    [Header("Curriculum")]
     [SerializeField] private DifficultyCurriculumMapper curriculumMapper;
 
     [Header("Player")]
     [SerializeField] private PlayerAgent player;
 
-    [Header("Spawn Points (optional tiers)")]
+    [Header("Spawn Points")]
     [SerializeField] private Transform[] easySpawns;
     [SerializeField] private Transform[] midSpawns;
     [SerializeField] private Transform[] hardSpawns;
@@ -140,7 +140,7 @@ public class EpisodeResetManager : MonoBehaviour
         Quaternion rot = (spawn != null) ? spawn.rotation : Quaternion.identity;
 
         if (spawn == null)
-            Debug.LogWarning("[EpisodeResetManager] PickSpawnPoint() returned null. Using origin as fallback.", this);
+            Debug.LogWarning("[EpisodeResetManager] PickSpawnPoint() returned null", this);
 
         if (refs.rb != null)
         {

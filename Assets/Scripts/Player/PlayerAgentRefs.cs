@@ -2,23 +2,19 @@ using UnityEngine;
 
 public class PlayerAgentRefs : MonoBehaviour
 {
-    [Header("Required")]
+    
     public Rigidbody rb;
     public WoodTracker woodTracker;
     public SlashCoolDown slashCooldown;
 
-    [Header("Optional / Recommended")]
+    
     public Animator animator;
     public Collider swordHitbox;
     public Transform body;
     public PlayerHarvest harvest;
 
-    [Header("Health")]
     public float maxHp = 100f;
     public float hp = 100f;
-
-    [Header("Boat Progress")]
-    public Transform boatTransform;
 
     public void ValidateOrThrow()
     {
@@ -31,7 +27,7 @@ public class PlayerAgentRefs : MonoBehaviour
         if (harvest == null)
             harvest = GetComponentInChildren<PlayerHarvest>(true);
 
-        if (maxHp <= 0f) throw new System.ArgumentOutOfRangeException(nameof(maxHp), "maxHp must be > 0.");
+        if (maxHp <= 0f) throw new System.ArgumentOutOfRangeException(nameof(maxHp), "maxHp must be > 0");
 
         hp = Mathf.Clamp(hp, 0f, maxHp);
     }

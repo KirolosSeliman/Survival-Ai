@@ -22,7 +22,6 @@ public class PlayerAgent : Agent
     private readonly Dictionary<int, int> rewardedHitsPerEnemy = new Dictionary<int, int>();
 
     [Header("Slash Execution")]
-    [Tooltip("Sword hitbox GameObject (trigger collider + SwordHitboxRelay). Keep DISABLED by default.")]
     [SerializeField] private GameObject swordHitbox;
     private float hitboxDisableAt;
 
