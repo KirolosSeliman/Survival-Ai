@@ -1,10 +1,9 @@
 using UnityEngine;
 using Unity.MLAgents;
 
-[DisallowMultipleComponent]
 public class DifficultyCurriculumMapper : MonoBehaviour
 {
-    [Header("References")]
+    [Header("Référence")]
     [SerializeField] private EpisodeResetManager resetManager;
     [SerializeField] private PlayerAgent player;
 
@@ -12,16 +11,16 @@ public class DifficultyCurriculumMapper : MonoBehaviour
     [SerializeField] private PlayerAgentConfig baseConfigAsset;
     [SerializeField] private PlayerAgentConfig runtimeConfig;
 
-    [Header("Environment Parameter")]
+    [Header("Environment parameters")]
     [SerializeField] private string difficultyParamName = "difficulty";
     [SerializeField] private float difficultyMin = 0f;
     [SerializeField] private float difficultyMax = 10f;
 
-    [Header("Override difficulty to Debug")]
+    [Header("Override difficulty to debug")]
     [SerializeField] private bool useInspectorDifficulty = false;
     [SerializeField] private float inspectorDifficulty = 6f;
 
-    [Header("EASY (difficulty=0) overrides")]
+    [Header("EASY (difficulty=0)")]
     [SerializeField] private int easyTargetWood = 3;
 
     [SerializeField] private float easyEnemySpawnChancePerTree = 0.0f;
@@ -35,28 +34,25 @@ public class DifficultyCurriculumMapper : MonoBehaviour
     [SerializeField] private float easyStepPenalty = -0.0001f;
     [SerializeField] private float easyWaterStepPenalty = 0f;
 
-    [Header("Optional shaping ramps")]
+    // enemy slash cooldown et speed changé avec la difficulté
     [SerializeField] private bool scaleEnemyBrain = true;
     [SerializeField] private float easyEnemyAttackCooldown = 5.0f;
     [SerializeField] private float easyEnemyMoveSpeed = 1.0f;
 
-    [Header("Anti-collapse shaping")]
-    [Tooltip("Enemy difficulty scales exponentially, but its flattened.")]
+    // enemy t curve, flat au début pour les introduirs après
     [SerializeField] private float enemyCurvePower = 2.2f;
 
-    [Tooltip("Drain scales exponentially (flattened).")]
+    // drain t curve 
     [SerializeField] private float drainCurvePower = 1.4f;
 
-    [Tooltip("Clamp step penalty so it can't dominate")]
     [SerializeField] private float maxNegativeStepPenalty = -0.0002f;
 
-    [Tooltip("Clamp water step penalty so it can't dominate")]
     [SerializeField] private float maxNegativeWaterStepPenalty = -0.00025f;
 
-    [Tooltip("Scale wood reward with difficulty to keep farming the main objectif at the higher levels.")]
+    // on scale les woods rewards avec la difficulté pour garder le farming l'objectif principal aux niveaux suppérieurs
     [SerializeField] private bool scaleWoodRewardWithDifficulty = true;
 
-    [Tooltip("At max difficulty, wood pickup reward will be multiplied by this factor.")]
+    // à la difficulté max le wood pickup reward est multiplié par ce float
     [SerializeField] private float woodRewardMultiplierAtMax = 2f;
 
     public enum SpawnTier { Easy, Mid, Hard }
@@ -70,60 +66,80 @@ public class DifficultyCurriculumMapper : MonoBehaviour
     }
     private float GetEffectiveDifficultyRaw()
     {
+        // si le training est actif, toujours prendre la difficulé de ML-Agents
+        // trouver les paramètes dans l'environnement nommé "difficulté" ou retourner difficultyMin
         if (Application.isBatchMode)
-        {
             return Academy.Instance.EnvironmentParameters.GetWithDefault(difficultyParamName, difficultyMin);
-        }
 
-        return useInspectorDifficulty ? inspectorDifficulty : Academy.Instance.EnvironmentParameters.GetWithDefault(difficultyParamName, difficultyMin);
+        if (useInspectorDifficulty == true)
+            return inspectorDifficulty;
+        else
+            return Academy.Instance.EnvironmentParameters.GetWithDefault(difficultyParamName, difficultyMin);
     }
     private void Awake()
     {
-        if (resetManager == null) resetManager = GetComponent<EpisodeResetManager>();
-        if (player == null) player = FindFirstObjectByType<PlayerAgent>();
+        if (resetManager == null)
+            resetManager = GetComponent<EpisodeResetManager>();
+        if (player == null)
+            player = FindFirstObjectByType<PlayerAgent>();
 
         if (baseConfigAsset == null)
         {
-            Debug.LogError("[DifficultyCurriculumMapper] Missing baseConfigAsset ", this);
+            Debug.LogError("DifficultyCurriculumMapper --> Missing baseConfigAsset ", this);
             return;
         }
 
         runtimeConfig = Instantiate(baseConfigAsset);
         runtimeConfig.name = baseConfigAsset.name + "_RUNTIME";
+        // on veut pas save la config et le build dans l'éditeur parce que ça change à chaque épisodes durant le training
         runtimeConfig.hideFlags = HideFlags.DontSaveInEditor | HideFlags.DontSaveInBuild;
 
-        if (resetManager != null) resetManager.SetConfig(runtimeConfig);
-        if (player != null) player.config = runtimeConfig;
+        if (resetManager != null)
+            resetManager.SetConfig(runtimeConfig);
+        if (player != null)
+            player.config = runtimeConfig;
 
         ApplyNow();
     }
-   
+
     public void ApplyNow()
     {
-        if (runtimeConfig == null || baseConfigAsset == null) return;
+        if (runtimeConfig == null || baseConfigAsset == null)
+            return;
 
         float d = GetEffectiveDifficultyRaw();
         //Debug.Log($"[CurriculumMapper] difficultyParam='{difficultyParamName}' value={d} (default={difficultyMin})");
         // on les enlèves durant les vrais entrainements,car consome pour rien
+
+        // normaliser la difficulté
         float t = Mathf.InverseLerp(difficultyMin, difficultyMax, d);
+        // on force t à rester en 0 et 1
         t = Mathf.Clamp01(t);
 
+        // appliquer toutes les valeurs comme, par exemple, le targetWood 
         ApplyMapping(t);
         //Debug.Log($"d={d} t01={t} enemySpawnChance={runtimeConfig.enemySpawnChancePerTree}");
- 
+
+        // empêche certaines valeurs d’être impossibles
         runtimeConfig.ValidateRuntime();
     }
 
     private void ApplyMapping(float t01)
     {
-  
-        float tEnemy = Mathf.Pow(t01, Mathf.Max(0.01f, enemyCurvePower));
-        float tDrain = Mathf.Pow(t01, Mathf.Max(0.01f, drainCurvePower));
+        // dans cette fonction, c'est là qu'on applique la difficulté normalisé entre 0 et 1 de tous les aspects du training
+        // avec Math.Lerp, les Math.Max sont des sécurité pour pas que sa donne une mauvaise valeur et brise le training
+        // c'est comme ça qu'on augmente la difficulté avec le "temps" 
+        float tEnemy = Mathf.Pow(t01, Mathf.Max(0.01f, enemyCurvePower)); // sécurité
+        float tDrain = Mathf.Pow(t01, Mathf.Max(0.01f, drainCurvePower)); //sécurité
 
         // player goals
         runtimeConfig.targetWood = Mathf.RoundToInt(Mathf.Lerp(easyTargetWood, baseConfigAsset.targetWood, t01));
-        runtimeConfig.targetWood = Mathf.Max(1, runtimeConfig.targetWood);
-
+        runtimeConfig.targetWood = Mathf.Max(1, runtimeConfig.targetWood); // sécurité
+        /*
+            t01 = 0   --> 3 bois
+            t01 = 0.5 -->  6.5 bois, donc on veut 7
+            t01 = 1   --> 10 bois
+         */
         runtimeConfig.playerMaxHp = Mathf.Lerp(easyPlayerMaxHp, baseConfigAsset.playerMaxHp, t01);
         runtimeConfig.playerDamageToEnemy = Mathf.Lerp(easyPlayerDamageToEnemy, baseConfigAsset.playerDamageToEnemy, t01);
 
@@ -138,7 +154,9 @@ public class DifficultyCurriculumMapper : MonoBehaviour
 
         // Ennemy
         runtimeConfig.enemySpawnChancePerTree = Mathf.Lerp(easyEnemySpawnChancePerTree, baseConfigAsset.enemySpawnChancePerTree, tEnemy);
-        runtimeConfig.enemyMaxHealth = 1f; // on la set à 1hp, car dans les niveaux supérieurs où il y a beaucoup d'ennemis, c'est trop difficile de devoir les attaquer plusieurs fois pour les tuer, surtout quand il y en a plusieurs autour
+        // on la set à 1hp, car dans les niveaux supérieurs où il y a beaucoup d'ennemis, c'est trop difficile de devoir les attaquer
+        // plusieurs fois pour les tuer, surtout quand il y en a plusieurs autour
+        runtimeConfig.enemyMaxHealth = 1f;
         runtimeConfig.enemyDamageToPlayer = Mathf.Lerp(easyEnemyDamageToPlayer, baseConfigAsset.enemyDamageToPlayer, tEnemy);
 
         if (scaleEnemyBrain)
@@ -157,10 +175,12 @@ public class DifficultyCurriculumMapper : MonoBehaviour
         // hard code pour s'assurer qu'il n'y a pas d'erreur
         if (dEff < 5.0f) runtimeConfig.enemySpawnChancePerTree = 0f;
 
-        // Rewards 
+        // Rewards (la récompense de victoire et la pénalité de mort restent les mêmes que dans la config de base)
         runtimeConfig.rewardWin = baseConfigAsset.rewardWin;
         runtimeConfig.penaltyDeath = baseConfigAsset.penaltyDeath;
 
+        // si le wood reward change selon la difficulté (durant le training)
+        // et on veut que l'agent comprenne que ramasser du bois reste l'objectif principal
         float woodReward = baseConfigAsset.rewardPerWoodPickup;
         if (scaleWoodRewardWithDifficulty)
         {
@@ -171,9 +191,11 @@ public class DifficultyCurriculumMapper : MonoBehaviour
 
         runtimeConfig.rewardEnemyHit = baseConfigAsset.rewardEnemyHit;
         runtimeConfig.rewardEnemyKill = baseConfigAsset.rewardEnemyKill;
+        // limite pour pas qu'il farm hit les ennemis (on essaie de le faire comprendre qu'il
+        // peut fuir s'il peut prendre plus de bois)
         runtimeConfig.maxRewardedHitsPerEnemy = baseConfigAsset.maxRewardedHitsPerEnemy;
 
-        // Preserve authored constants
+        // change pas avec la difficulté
         runtimeConfig.maxStep = baseConfigAsset.maxStep;
         runtimeConfig.moveSpeed = baseConfigAsset.moveSpeed;
         runtimeConfig.rotateSpeedDegPerSec = baseConfigAsset.rotateSpeedDegPerSec;
