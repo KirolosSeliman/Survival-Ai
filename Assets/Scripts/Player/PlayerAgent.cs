@@ -7,7 +7,7 @@ using Unity.MLAgents.Sensors;
 [RequireComponent(typeof(PlayerAgentRefs))]
 public class PlayerAgent : Agent
 {
-    [Header("Config (single source of truth)")]
+    [Header("Config")]
     public PlayerAgentConfig config;
 
     private PlayerAgentRefs refs;
@@ -21,14 +21,12 @@ public class PlayerAgent : Agent
 
     private readonly Dictionary<int, int> rewardedHitsPerEnemy = new Dictionary<int, int>();
 
-    [Header("Slash Execution")]
     [SerializeField] private GameObject swordHitbox;
     private float hitboxDisableAt;
 
-    [Header("Animation (optional)")]
     [SerializeField] private PlayerAnimatorController animatorController;
 
-    [Header("Harvest (optional)")]
+    [Header("Harvest")]
     [SerializeField] private PlayerHarvest playerHarvest;
 
     [Header("Debug - Rays")]
@@ -51,13 +49,13 @@ public class PlayerAgent : Agent
 
         resetManager = FindFirstObjectByType<EpisodeResetManager>();
         if (resetManager == null)
-            throw new MissingReferenceException("PlayerAgent requires an EpisodeResetManager in the scene.");
+            throw new MissingReferenceException("");
 
         if (config == null)
             config = resetManager.GetCurrentConfig();
 
         if (config == null)
-            throw new MissingReferenceException("PlayerAgent.config is required (PlayerAgentConfig).");
+            throw new MissingReferenceException("PlayerAgent.config");
 
         config.ValidateRuntime();
         MaxStep = config.maxStep;
@@ -97,7 +95,7 @@ public class PlayerAgent : Agent
     public override void OnEpisodeBegin()
     {
         if (resetManager == null)
-            throw new MissingReferenceException("EpisodeResetManager missing at OnEpisodeBegin.");
+            throw new MissingReferenceException("EpisodeResetManager missing");
 
         resetManager.ResetEnvironment();
 
@@ -332,7 +330,7 @@ public class PlayerAgent : Agent
     {
         if (enemy == null) return;
         
-        // Mark the current swing as successful if we are within the active hitbox window.
+        // marquer le swing 
         if (swordHitbox != null && swordHitbox.activeSelf)
             swingHitSomething = true;
 

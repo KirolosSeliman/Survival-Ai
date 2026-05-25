@@ -13,9 +13,9 @@ public class PlayerHarvest : MonoBehaviour
         if (agent == null) agent = GetComponentInParent<PlayerAgent>();
         if (refs == null) refs = GetComponentInParent<PlayerAgentRefs>();
 
-        if (agent == null) throw new MissingReferenceException("PlayerHarvest requires PlayerAgent");
-        if (refs == null) throw new MissingReferenceException("PlayerHarvest requires PlayerAgentRefs");
-        if (agent.config == null) throw new MissingReferenceException("PlayerHarvest requires PlayerAgent.config");
+        if (agent == null) throw new MissingReferenceException("");
+        if (refs == null) throw new MissingReferenceException("");
+        if (agent.config == null) throw new MissingReferenceException("");
 
         agent.config.ValidateRuntime();
         hits = new Collider[Mathf.Max(8, agent.config.harvestMaxHits)];
