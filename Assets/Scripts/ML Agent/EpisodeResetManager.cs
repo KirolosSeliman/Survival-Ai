@@ -1,5 +1,11 @@
 using System.Collections.Generic;
+using System.Net;
+using Unity.VisualScripting.Antlr3.Runtime;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.ProBuilder.Shapes;
+using UnityEngine.UIElements;
 
 public class EpisodeResetManager : MonoBehaviour
 {
@@ -35,12 +41,14 @@ public class EpisodeResetManager : MonoBehaviour
 
     // le reset manager cache les postions
     private HarvestTree[] cachedTrees;
+    // on la met déjà à 256 (arbitraire) pour éviter trop de modification de list, car il y a
+    // beacoup d'épisodes et de reset
     private readonly List<GameObject> activeEnemies = new List<GameObject>(256);
 
     private void Awake()
     {
         if (Instance != null && Instance != this)
-            throw new UnityException("");
+            throw new UnityException();
 
         Instance = this;
 
@@ -53,12 +61,16 @@ public class EpisodeResetManager : MonoBehaviour
         config.ValidateRuntime();
 
         // rend la hiarchie plus claire car les ennemies et les drops spawn en dessous  du game object avec le nom approprié
-        if (runtimeEnemiesRoot == null) runtimeEnemiesRoot = CreateRoot("Runtime_Enemies");
-        if (runtimeDropsRoot == null) runtimeDropsRoot = CreateRoot("Runtime_Drops");
-
+        if (runtimeEnemiesRoot == null) 
+            runtimeEnemiesRoot = CreateRoot("Runtime_Enemies");
+        if (runtimeDropsRoot == null) 
+            runtimeDropsRoot = CreateRoot("Runtime_Drops");
+        
+        //ça trouve tous les arbres récoltables dans la scène et les garde en mémoire dans cachedTrees
         cachedTrees = FindObjectsByType<HarvestTree>(FindObjectsSortMode.None);
     }
 
+    // créer des conteneurs comme Runtime_Enemies pour organiser les objets générés pendant les épisodes 
     private Transform CreateRoot(string name)
     {
         var go = new GameObject(name);
@@ -69,7 +81,8 @@ public class EpisodeResetManager : MonoBehaviour
     public void SetConfig(PlayerAgentConfig cfg)
     {
         config = cfg;
-        if (config != null) config.ValidateRuntime();
+        if (config != null) 
+            config.ValidateRuntime();
     }
 
     public PlayerAgentConfig GetCurrentConfig() => config;
@@ -79,8 +92,9 @@ public class EpisodeResetManager : MonoBehaviour
         if (player == null || config == null)
             throw new MissingReferenceException("player ou config maquant");
 
-       // applique
-        curriculumMapper?.ApplyNow();
+        // applique
+        if (curriculumMapper != null)
+            curriculumMapper.ApplyNow();
         config.ValidateRuntime();
 
         // clear les vieux trucs
@@ -103,9 +117,11 @@ public class EpisodeResetManager : MonoBehaviour
 
         foreach (var tree in cachedTrees)
         {
-            if (tree == null) continue;
+            // si un arbre a été détruit ou n’existe plus, on l’ignore
+            if (tree == null) 
+                continue;
             tree.ApplyConfig(config);
-            tree.ResetTreeToFull();
+            tree.ResetTreeToFull(); // remet les arbes à leur full capacité
         }
     }
 
@@ -118,7 +134,8 @@ public class EpisodeResetManager : MonoBehaviour
         refs.maxHp = config.playerMaxHp;
         refs.hp = refs.maxHp;
 
-        refs.slashCooldown?.SetCooldown(config.slashCooldownSeconds);
+        if (refs.slashCooldown != null)
+            refs.slashCooldown.SetCooldown(config.slashCooldownSeconds);
 
         if (refs.woodTracker != null)
         {
@@ -126,7 +143,8 @@ public class EpisodeResetManager : MonoBehaviour
             refs.woodTracker.ResetProgress();
         }
 
-        refs.harvest?.ApplyConfig(config);
+        if (refs.harvest != null)
+            refs.harvest.ApplyConfig(config);
 
         if (refs.rb != null)
         {
@@ -135,12 +153,14 @@ public class EpisodeResetManager : MonoBehaviour
         }
 
         Transform spawn = PickSpawnPoint();
-        // last resort 
-        Vector3 pos = (spawn != null) ? spawn.position : Vector3.zero;
-        Quaternion rot = (spawn != null) ? spawn.rotation : Quaternion.identity;
+        // last resort, c'est mieu que de planter le reset complet 
+        Vector3 pos = (spawn != null) ? 
+            spawn.position : Vector3.zero;
+        Quaternion rot = (spawn != null) ? 
+            spawn.rotation : Quaternion.identity;
 
         if (spawn == null)
-            Debug.LogWarning("[EpisodeResetManager] PickSpawnPoint() returned null", this);
+            Debug.LogWarning("EpisodeResetManager --> PickSpawnPoint() à retourné null", this);
 
         if (refs.rb != null)
         {
@@ -148,9 +168,7 @@ public class EpisodeResetManager : MonoBehaviour
             refs.rb.rotation = rot;
         }
         else
-        {
             player.transform.SetPositionAndRotation(pos, rot);
-        }
     }
 
     private Transform PickSpawnPoint()
@@ -159,6 +177,7 @@ public class EpisodeResetManager : MonoBehaviour
         if (curriculumMapper != null)
             tier = curriculumMapper.GetSpawnTier();
 
+        // on choisi les spawns points de la scène
         Transform[] set = tier switch
         {
             DifficultyCurriculumMapper.SpawnTier.Easy => easySpawns,
@@ -169,35 +188,43 @@ public class EpisodeResetManager : MonoBehaviour
 
         if (set == null || set.Length == 0)
         {
+            // si on est en hard, mais c'est vide prend medium, si medium est vide prend easy
             if (tier == DifficultyCurriculumMapper.SpawnTier.Hard)
-                set = (midSpawns != null && midSpawns.Length > 0) ? midSpawns : easySpawns;
+                set = (midSpawns != null && midSpawns.Length > 0) ? 
+                    midSpawns : easySpawns;
             else if (tier == DifficultyCurriculumMapper.SpawnTier.Mid)
                 set = easySpawns;
 
             if (set == null || set.Length == 0)
             {
-                Debug.LogError("[EpisodeResetManager] no spawn points configured (easy/mid/hard).", this);
+                Debug.LogError("EpisodeResetManager --> pas de spawn point configuré", this);
                 return null;
             }
 
-            Debug.LogWarning($"[EpisodeResetManager] spawn tier '{tier}' empty, fallback used.", this);
+            Debug.LogWarning($"EpisodeResetManager --> spawn tier {tier} vide, utilisé le fallback", this);
         }
 
+        // choisi un spawn aléatoire dans le tableau
         return set[Random.Range(0, set.Length)];
     }
 
     private void SpawnEnemiesNearTrees()
     {
-        if (enemyPrefab == null) return;
-        if (cachedTrees == null || cachedTrees.Length == 0) return;
+        if (enemyPrefab == null) 
+            return;
+        if (cachedTrees == null || cachedTrees.Length == 0) 
+            return;
 
         foreach (var tree in cachedTrees)
         {
-            if (tree == null) continue;
+            if (tree == null) 
+                continue;
 
+            //  décide aléatoirement si un ennemi doit apparaître à coter de cet arbre
             if (Random.value > config.enemySpawnChancePerTree)
                 continue;
 
+            // choisit un décalage aléatoire autour de l’arbre (dans un cercle)
             Vector3 basePos = tree.transform.position;
             Vector2 r = Random.insideUnitCircle * config.enemySpawnOffsetRadius;
             Vector3 spawnPos = new Vector3(basePos.x + r.x, basePos.y, basePos.z + r.y);
@@ -213,6 +240,7 @@ public class EpisodeResetManager : MonoBehaviour
     {
         if (enemy == null) return;
 
+        // si c'est pas null on applique
         enemy.GetComponent<EnemyMotorBehavior>()?.ApplyConfig(config);
         enemy.GetComponent<EnemyPerceptionScan>()?.ApplyConfig(config);
         enemy.GetComponent<EnemyBrainLogic>()?.ApplyConfig(config);
@@ -226,15 +254,21 @@ public class EpisodeResetManager : MonoBehaviour
             hp.SetPlayerAgent(player);
             hp.ResetToFull();
         }
-
         enemy.GetComponent<EnemyBrainLogic>()?.ForceDisableHitbox();
     }
-
+    
+    // prend une position approximative et la corrige pour poser l’objet proprement
+    // sur le sol avec un raycast
     private Vector3 SpawnObjectToGround(Vector3 pos)
     {
         Vector3 origin = pos + Vector3.up * dropRayUp;
 
-        if (Physics.Raycast(origin, Vector3.down, out RaycastHit hit,dropRayUp + dropRayDown, dropGroundMask, QueryTriggerInteraction.Ignore))
+        if (Physics.Raycast(origin, 
+            Vector3.down, 
+            out RaycastHit hit,
+            dropRayUp + dropRayDown, 
+            dropGroundMask, 
+            QueryTriggerInteraction.Ignore))
         {
             return hit.point + hit.normal * dropGroundOffset;
         }
@@ -244,7 +278,8 @@ public class EpisodeResetManager : MonoBehaviour
 
     public GameObject SpawnDrop(GameObject prefab, Vector3 pos, Quaternion rot)
     {
-        if (prefab == null) return null;
+        if (prefab == null) 
+            return null;
 
         pos = SpawnObjectToGround(pos);
 
@@ -258,6 +293,7 @@ public class EpisodeResetManager : MonoBehaviour
         return wood;
     }
 
+    // on supprime les anciens ennemis, bois, etc. de la scène d'avant
     private void DestroyChildren(Transform root)
     {
         if (root == null) return;
@@ -270,19 +306,22 @@ public class EpisodeResetManager : MonoBehaviour
         }
     }
 
-    // a partir des cached tree 
+    // à partir des cached tree 
     // origine c'est la position du player
     public Transform GetNearestTree(Vector3 origin, float maxDistance)
     {
-        if (cachedTrees == null || cachedTrees.Length == 0) return null;
+        if (cachedTrees == null || cachedTrees.Length == 0) 
+            return null;
 
         float bestSqr = float.PositiveInfinity;
         Transform best = null;
 
         foreach (var tree in cachedTrees)
         {
-            if (tree == null) continue;
-            if (tree.IsDepleted) continue;
+            if (tree == null)
+                continue;
+            if (tree.IsDepleted) 
+                continue;
 
             float sqr = (tree.transform.position - origin).sqrMagnitude;
             if (sqr < bestSqr)
@@ -300,17 +339,20 @@ public class EpisodeResetManager : MonoBehaviour
         float bestSqr = maxDistance * maxDistance;
         Transform best = null;
 
-        // Clean les null car a travers les milliers de run des fois il y a des erreurs,
+        // Clean les null, car a travers les milliers de run des fois il y a des erreurs,
         // alors il garde tout clean durant l'integralité de l'entrainement.
         for (int i = activeEnemies.Count - 1; i >= 0; i--)
         {
-            if (activeEnemies[i] == null) activeEnemies.RemoveAt(i);
+            if (activeEnemies[i] == null) 
+                activeEnemies.RemoveAt(i);
         }
 
         foreach (var e in activeEnemies)
         {
-            if (e == null) continue;
-            if (!e.activeInHierarchy) continue;
+            if (e == null) 
+                continue;
+            if (!e.activeInHierarchy) 
+                continue;
 
             float sqr = (e.transform.position - origin).sqrMagnitude;
             if (sqr <= bestSqr)
