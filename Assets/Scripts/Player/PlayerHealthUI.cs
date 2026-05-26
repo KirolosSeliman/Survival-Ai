@@ -19,8 +19,6 @@ public class PlayerHealthUI : MonoBehaviour
 
     private void Update()
     {
-        if (playerRefs == null) return;
-
         float hp = playerRefs.hp;
         float maxHp = Mathf.Max(1f, playerRefs.maxHp);
 

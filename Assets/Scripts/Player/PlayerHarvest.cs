@@ -36,7 +36,6 @@ public class PlayerHarvest : MonoBehaviour
         harvestedTree = null;
 
         var cfg = agent.config;
-        if (cfg == null) return false;
 
         Transform playerT = refs.body != null ? refs.body : transform;
         Vector3 origin = playerT.position;

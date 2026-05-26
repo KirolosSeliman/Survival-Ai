@@ -109,7 +109,6 @@ public class PlayerAgent : Agent
 
     private void FixedUpdate()
     {
-        if (refs == null || config == null) return;
 
         if (refs.hp > 0f)
         {
@@ -263,7 +262,7 @@ public class PlayerAgent : Agent
     {
        
 
-        if (refs == null || refs.slashCooldown == null) return;
+        if (refs.slashCooldown == null) return;
         if (!refs.slashCooldown.TrySlash()) return;
 
         swingHitSomething = false;
@@ -328,7 +327,6 @@ public class PlayerAgent : Agent
 
     public void NotifyEnemyHit(GameObject enemy, float damageAmount)
     {
-        if (enemy == null) return;
         
         // marquer le swing 
         if (swordHitbox != null && swordHitbox.activeSelf)
@@ -346,7 +344,6 @@ public class PlayerAgent : Agent
 
     public void NotifyEnemyKilled(GameObject enemy)
     {
-        if (enemy == null) return;
 
         AddReward(config.rewardEnemyKill);
 

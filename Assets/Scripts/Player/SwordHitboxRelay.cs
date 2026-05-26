@@ -18,7 +18,7 @@ public class SwordHitboxRelay : MonoBehaviour
 
     private void ApplyFromAgentConfig()
     {
-        if (agent == null || agent.config == null) return;
+        if (agent.config == null) return;
         enemyDamage = agent.config.playerDamageToEnemy;
         enemyTag = agent.config.enemyTag;
     }
@@ -31,7 +31,7 @@ public class SwordHitboxRelay : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (agent == null || other == null) return;
+        if (other == null) return;
 
         int id = other.GetInstanceID();
 
