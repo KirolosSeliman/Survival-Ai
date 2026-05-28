@@ -1,15 +1,13 @@
 using UnityEngine;
 
-/// <summary>
-/// Cette composante ce met sur le prefab du wood qui spawn de l'arbre
-/// permet de destroy le game object qui l'utilise quand le wood se met dans l'inventaire
-/// permet de facilement compter de maniere individuelle le wood qui tombe
-/// </summary>
+/* Cette composante ce met sur le prefab du wood qui spawn de l'arbre
+permet de destroy le game object qui l'utilise quand le wood se met dans l'inventaire
+permet de facilement compter de maniere individuelle le wood qui tombe */
 
 [RequireComponent (typeof(Collider))]
 public class DropedWood : MonoBehaviour
 {
-    [Header("Nombre de wood par prefab, doit etre égale HarvestTree woodPerHit")]
+    [Header("Nombre de bois par prefab, doit etre égale HarvestTree woodPerHit")]
     [SerializeField] private int amount = 1;
 
     
@@ -31,8 +29,10 @@ public class DropedWood : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (collected) return;
-        if (!other.CompareTag(collectorTag)) return;
+        if (collected) 
+            return;
+        if (!other.CompareTag(collectorTag)) 
+            return;
 
         // le wood tracker component est sur le player
         WoodTracker tracker = other.GetComponentInParent<WoodTracker>();

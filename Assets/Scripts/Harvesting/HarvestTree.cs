@@ -22,12 +22,13 @@ public class HarvestTree : MonoBehaviour
         treeCollider = GetComponent<Collider>();
         
         if (woodDropPrefab == null)
-            Debug.LogError("woodDropPrefab is missing.");
+            Debug.LogError("Pas de woodDropPrefab");
     }
 
     public void ApplyConfig(PlayerAgentConfig cfg)
     {
-        if (cfg == null) return;
+        if (cfg == null) 
+            return;
 
         maxWood = cfg.treeMaxWood;
         woodPerHit = cfg.treeWoodPerHit;
@@ -47,13 +48,12 @@ public class HarvestTree : MonoBehaviour
         treeCollider.enabled = true;
     }
 
-    /// <summary>
-    /// drop le wood prefab lorsque le player hit l'arbre
-    /// fonction qui comunique avec player
-    /// </summary>
+    // drop le wood prefab lorsque le player hit l'arbre
+    // fonction qui comunique avec player
     public void ApplyHit()
     {
-        if (IsDepleted) return;
+        if (IsDepleted) 
+            return;
 
         int taken = woodPerHit;
         DropWood(taken);
@@ -66,9 +66,10 @@ public class HarvestTree : MonoBehaviour
 
     private void DropWood(int count)
     {
-        if (count <= 0) return;
+        if (count <= 0) 
+            return;
 
-        //Normalement une seul itértion, car 1 woodPerhit
+        // normalement une seul itértion, car 1 woodPerhit
         for (int i = 0; i < count; i++)
         {
             Vector2 r = Random.insideUnitCircle * dropRadius;

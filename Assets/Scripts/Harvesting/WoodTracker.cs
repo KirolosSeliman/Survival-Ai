@@ -15,7 +15,8 @@ public class WoodTracker : MonoBehaviour
     public void SetTarget(int target)
     {
         // si ce n'est pas bon, par défaut c'est 10
-        if (target <= 0) target = 10;  
+        if (target <= 0) 
+            target = 10;  
 
         bool wasReached = ReachedTargetWood;
         targetWood = target;
@@ -26,8 +27,10 @@ public class WoodTracker : MonoBehaviour
 
     public void AddCollectedWood(int addedAmount)
     {
-        if (addedAmount <= 0) return;
-        if (ReachedTargetWood) return;
+        if (addedAmount <= 0) 
+            return;
+        if (ReachedTargetWood) 
+            return;
 
         bool wasReached = ReachedTargetWood;
 

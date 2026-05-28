@@ -52,9 +52,10 @@ public class EpisodeResetManager : MonoBehaviour
 
         Instance = this;
 
-        if (player == null) player = FindFirstObjectByType<PlayerAgent>();
-        if (curriculumMapper == null) curriculumMapper = GetComponent<DifficultyCurriculumMapper>();
-
+        if (player == null) 
+            player = FindFirstObjectByType<PlayerAgent>();
+        if (curriculumMapper == null) 
+            curriculumMapper = GetComponent<DifficultyCurriculumMapper>();
         if (config == null)
             throw new MissingReferenceException("");
 
@@ -129,7 +130,7 @@ public class EpisodeResetManager : MonoBehaviour
     {
         var refs = player.GetComponent<PlayerAgentRefs>();
         if (refs == null)
-            throw new MissingReferenceException("refs sont manquants");
+            throw new MissingReferenceException();
 
         refs.maxHp = config.playerMaxHp;
         refs.hp = refs.maxHp;
@@ -160,7 +161,7 @@ public class EpisodeResetManager : MonoBehaviour
             spawn.rotation : Quaternion.identity;
 
         if (spawn == null)
-            Debug.LogWarning("EpisodeResetManager --> PickSpawnPoint() à retourné null", this);
+            Debug.LogWarning("EpisodeResetManager --> PickSpawnPoint() donne null", this);
 
         if (refs.rb != null)
         {
@@ -238,7 +239,8 @@ public class EpisodeResetManager : MonoBehaviour
 
     private void ConfigureSpawnedEnemy(GameObject enemy)
     {
-        if (enemy == null) return;
+        if (enemy == null) 
+            return;
 
         // si c'est pas null on applique
         enemy.GetComponent<EnemyMotorBehavior>()?.ApplyConfig(config);
