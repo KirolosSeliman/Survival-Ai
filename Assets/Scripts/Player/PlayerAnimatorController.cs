@@ -28,8 +28,6 @@ public class PlayerAnimatorController : MonoBehaviour
 
     private void Update()
     {
-        if (animator == null || rb == null) return;
-
         Vector3 v = rb.linearVelocity; 
         v.y = 0f;
         animator.SetFloat(speedParam, v.magnitude);
@@ -37,14 +35,12 @@ public class PlayerAnimatorController : MonoBehaviour
 
     public void TriggerAttack()
     {
-        if (animator == null) return;
         animator.ResetTrigger(attackTrigger);
         animator.SetTrigger(attackTrigger);
     }
 
     public void SetDead(bool dead)
     {
-        if (animator == null) return;
         animator.SetBool(deadBool, dead);
     }
 }
